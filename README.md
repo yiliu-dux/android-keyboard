@@ -1,3 +1,11 @@
+### Fork changes
+
+- update encoding for windows android studio
+- un-rounded action button
+- expanded resizing limits
+- made horizontal/vertical spacing between keys uniform
+
+
 # FUTO Keyboard
 
 The goal is to make a good modern keyboard that stays offline and doesn't spy on you. This keyboard is a fork of [LatinIME, The Android Open-Source Keyboard](https://android.googlesource.com/platform/packages/inputmethods/LatinIME), with significant changes made to it.

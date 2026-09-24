@@ -429,7 +429,7 @@ class BasicThemeProvider(val context: Context, val colorScheme: KeyboardColorSch
             48.dp * roundness
         }
 
-        val actionKeyRadius = 128.dp * roundness
+        val actionKeyRadius = 9.dp * roundness
 
         keyStyles = mapOf(
             KeyVisualStyle.Action to if(expertMode) {
