@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.absoluteOffset
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -849,6 +850,8 @@ fun EmojiGrid(
                 .align(Alignment.CenterHorizontally)
                 .fillMaxWidth()
                 .weight(1.0f)
+                // Match the 1dp action bar separator above the search bar
+                .padding(top = 1.dp)
                 .background(
                     LocalKeyboardScheme.current.keyboardContainer,
                     RoundedCornerShape(9.dp)
@@ -1211,7 +1214,7 @@ val EmojiAction = Action(
                 val resources = LocalResources.current
                 if(searching.value) {
                     with(rowScope) {
-                        ActionHeaderSearch(searchText, Modifier.weight(1.0f))
+                        ActionHeaderSearch(searchText, Modifier.weight(1.0f).padding(vertical = 2.dp))
                     }
                 } else {
                     super.WindowTitleBar(rowScope)
@@ -1220,12 +1223,12 @@ val EmojiAction = Action(
                         contentColor = LocalKeyboardScheme.current.onKeyboardContainer,
                         shape = RoundedCornerShape(24.dp),
                         modifier = Modifier
-                            .minimumInteractiveComponentSize()
-                            .padding(2.dp)
+                            .padding(horizontal = 2.dp, vertical = 4.dp)
+                            .fillMaxHeight()
                             .width(128.dp),
                         onClick = { searching.value = true }
                     ) {
-                        Box(modifier = Modifier.padding(8.dp), contentAlignment = Alignment.CenterStart) {
+                        Box(modifier = Modifier.padding(horizontal = 8.dp), contentAlignment = Alignment.CenterStart) {
                             Row {
                                 Icon(Icons.Default.Search, contentDescription = null)
                                 Text(

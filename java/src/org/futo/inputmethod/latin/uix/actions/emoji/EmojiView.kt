@@ -51,6 +51,8 @@ class EmojiView @JvmOverloads constructor(
 
     companion object {
         private const val EMOJI_DRAW_TEXT_SIZE_DP = 48
+        // Fraction of the cell the glyph occupies, leaving space between emojis
+        private const val EMOJI_GLYPH_SCALE = 0.78f
     }
 
     init {
@@ -91,13 +93,6 @@ class EmojiView @JvmOverloads constructor(
         createBitmap(size, size)
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        setMeasuredDimension(
-            MeasureSpec.getSize(widthMeasureSpec) - context.resources.getDimensionPixelSize(R.dimen.emoji_picker_emoji_view_padding),
-            MeasureSpec.getSize(heightMeasureSpec) - context.resources.getDimensionPixelSize(R.dimen.emoji_picker_emoji_view_padding)
-        )
-    }
-
     private val bitmapPaint = Paint(Paint.FILTER_BITMAP_FLAG or Paint.ANTI_ALIAS_FLAG)
     override fun draw(canvas: Canvas) {
         super.draw(canvas)
@@ -108,7 +103,7 @@ class EmojiView @JvmOverloads constructor(
             val sX = width.toFloat() / bmpW
             val sY = height.toFloat() / bmpH
 
-            val scale = minOf(sX, sY)
+            val scale = minOf(sX, sY) * EMOJI_GLYPH_SCALE
 
             val scaledW = (bmpW * scale / textScale).coerceAtMost(width.toFloat())
             val scaledH = (bmpH * scale).coerceAtMost(height.toFloat())

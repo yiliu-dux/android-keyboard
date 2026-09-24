@@ -4,6 +4,8 @@
 - un-rounded action button
 - expanded resizing limits
 - made horizontal/vertical spacing between keys uniform
+- fix emoji and emoji search window spacing
+- add chinese input fuzzy pinyin
 
 
 # FUTO Keyboard
