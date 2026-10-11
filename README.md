@@ -6,6 +6,20 @@
 - made horizontal/vertical spacing between keys uniform
 - fix emoji and emoji search window spacing
 - add chinese input fuzzy pinyin
+- use [rime-ice](https://github.com/iDvel/rime-ice) for Simplified full pinyin when it is present in the imported Chinese dictionary (falls back to `luna_pinyin_simp`)
+
+#### Packing the rime-ice dictionary
+
+`tools/pack_rime_ice.py` builds an importable Chinese dictionary from a rime-ice clone (using its Lua-free schemas, as the bundled librime has no Lua plugin) on top of an existing FUTO Chinese dictionary zip (for Traditional, stroke and OpenCC data):
+
+```
+git clone https://github.com/iDvel/rime-ice
+python tools/pack_rime_ice.py --rime-ice ../rime-ice --base ../zidian-v26.02.dict --out rime-ice-zh.zip
+```
+
+- Add `--include-tencent` to also include the large Tencent word list (much slower first-time deployment on the phone).
+- Add `--name "..."` to set the dictionary name shown in the app. Importing a different name triggers re-extraction.
+- **Rename the output from `.zip` to `.dict`** (e.g. `rime-ice-zh.dict`), then import that file in FUTO Keyboard.
 
 
 # FUTO Keyboard

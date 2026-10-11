@@ -269,6 +269,8 @@ class ChineseIME(val helper: IMEHelper) : IMEInterface, SuggestionStripViewAcces
             'z' to '⼄',
         )
 
+        private const val RIME_ICE_SCHEMA = "rime_ice"
+
         @JvmStatic
         fun getRimeDir(context: Context) = context.getExternalFilesDir("rime")
                 ?: throw IllegalStateException("Failed to access ExternalFilesDir!")
@@ -567,6 +569,9 @@ class ChineseIME(val helper: IMEHelper) : IMEInterface, SuggestionStripViewAcces
     )
     private var prevConfiguration: Configuration? = null
 
+    private fun hasSharedSchema(schema: String) =
+        File(getShared(helper.context), "$schema.schema.yaml").exists()
+
     private fun writeCustomizationFile(cfg: Configuration) {
         val schema = cfg.schema
         val file = File(getUser(helper.context), "${schema}.custom.yaml")
@@ -583,7 +588,7 @@ class ChineseIME(val helper: IMEHelper) : IMEInterface, SuggestionStripViewAcces
             appendLine("    simplifier/option_name: futo_zh_simp")
 
             // Fuzzy pinyin only added to pinyin layouts
-            if(schema.startsWith("luna_pinyin")) {
+            if(schema.startsWith("luna_pinyin") || schema == RIME_ICE_SCHEMA) {
                 appendLine("    speller/algebra/+:")
                 cfg.fuzzyMode.forEach {
                     it.schemePatch.forEach {
@@ -617,6 +622,8 @@ class ChineseIME(val helper: IMEHelper) : IMEInterface, SuggestionStripViewAcces
                     "qwerty" -> {
                         when {
                             pinyinScheme == ChineseIMESettings.PinyinScheme.FullPinyin -> when {
+                                // rime-ice is Simplified-only, prefer it when the dictionary ships it
+                                simplified && hasSharedSchema(RIME_ICE_SCHEMA) -> RIME_ICE_SCHEMA
                                 simplified -> "luna_pinyin_simp"
                                 else -> "luna_pinyin"
                             }
