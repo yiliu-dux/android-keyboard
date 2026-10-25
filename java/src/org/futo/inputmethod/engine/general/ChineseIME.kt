@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import icu.astronot233.rime.DeployStage
 import icu.astronot233.rime.Rime
@@ -57,6 +58,7 @@ import org.futo.inputmethod.latin.uix.preferenceKeyFor
 import org.futo.inputmethod.latin.uix.setSetting
 import org.futo.inputmethod.latin.uix.settings.CollapsibleSection
 import org.futo.inputmethod.latin.uix.settings.DropDownPickerSettingItem
+import org.futo.inputmethod.latin.uix.settings.SettingToggleDataStore
 import org.futo.inputmethod.latin.uix.settings.SettingToggleRaw
 import org.futo.inputmethod.latin.uix.settings.UserSetting
 import org.futo.inputmethod.latin.uix.settings.UserSettingsMenu
@@ -146,6 +148,16 @@ object ChineseIMESettings {
         ""
     )
 
+    val TypoCorrectionSetting = SettingsKey(
+        booleanPreferencesKey("ChineseIME_typo_correction"),
+        false
+    )
+
+    val SchemaCorrectionSetting = SettingsKey(
+        booleanPreferencesKey("ChineseIME_schema_correction"),
+        false
+    )
+
     var schemaList: List<RimeSchema> = emptyList()
     val menu = UserSettingsMenu(
         title = R.string.chinese_settings_title,
@@ -206,6 +218,22 @@ object ChineseIMESettings {
                     }
                 }
 
+            },
+
+            UserSetting(R.string.chinese_setting_typo_correction) {
+                SettingToggleDataStore(
+                    stringResource(R.string.chinese_setting_typo_correction),
+                    TypoCorrectionSetting,
+                    stringResource(R.string.chinese_setting_typo_correction_subtitle)
+                )
+            },
+
+            UserSetting(R.string.chinese_setting_schema_correction) {
+                SettingToggleDataStore(
+                    stringResource(R.string.chinese_setting_schema_correction),
+                    SchemaCorrectionSetting,
+                    stringResource(R.string.chinese_setting_schema_correction_subtitle)
+                )
             },
 
         )
@@ -565,6 +593,7 @@ class ChineseIME(val helper: IMEHelper) : IMEInterface, SuggestionStripViewAcces
         val learning: Boolean,
         val simplification: Boolean,
         val autocorrect: Boolean,
+        val schemaCorrection: Boolean,
         val fuzzyMode: Set<ChineseIMESettings.FuzzyPinyinModes>
     )
     private var prevConfiguration: Configuration? = null
@@ -589,11 +618,14 @@ class ChineseIME(val helper: IMEHelper) : IMEInterface, SuggestionStripViewAcces
 
             // Fuzzy pinyin only added to pinyin layouts
             if(schema.startsWith("luna_pinyin") || schema == RIME_ICE_SCHEMA) {
+                // Misspelling rules split out of the schema by tools/pack_rime_ice.py
+                val correction = File(getShared(helper.context), "$schema.correction.txt")
+                    .takeIf { cfg.schemaCorrection && it.exists() }
+                    ?.readLines()?.filter { it.isNotBlank() }.orEmpty()
+
                 appendLine("    speller/algebra/+:")
-                cfg.fuzzyMode.forEach {
-                    it.schemePatch.forEach {
-                        appendLine("        - $it")
-                    }
+                (correction + cfg.fuzzyMode.flatMap { it.schemePatch }).forEach {
+                    appendLine("        - $it")
                 }
             }
         }
@@ -650,12 +682,12 @@ class ChineseIME(val helper: IMEHelper) : IMEInterface, SuggestionStripViewAcces
                     helper.context.getSetting(ChineseIMESettings.FuzzyPinyinSetting)
                 )
 
-                val autocorrect = settings.mAutoCorrectionEnabledPerUserSettings
-                        || settings.isSuggestionsEnabledPerUserSettings
+                val autocorrect = helper.context.getSetting(ChineseIMESettings.TypoCorrectionSetting)
+                val schemaCorrection = helper.context.getSetting(ChineseIMESettings.SchemaCorrectionSetting)
 
                 val learning = settings.isPersonalizationEnabled
 
-                val config = Configuration(schema, learning, simplified, autocorrect, fuzzy)
+                val config = Configuration(schema, learning, simplified, autocorrect, schemaCorrection, fuzzy)
                 if (config != prevConfiguration) {
                     rimeLoading.value = true
                     writeCustomizationFile(config)

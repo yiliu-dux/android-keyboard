@@ -58,8 +58,17 @@ def main():
     def add(rel: str, src: Path):
         files[rel] = src.read_bytes()
 
-    # Schemas
-    add("rime_ice.schema.yaml", no_lua / "rime_ice.schema.yaml")
+    # Schemas. The misspelling rules (自动纠错, up to the end of speller/algebra) are moved to
+    # rime_ice.correction.txt, which ChineseIME.kt appends back only when the user enables them
+    schema = (no_lua / "rime_ice.schema.yaml").read_text(encoding="utf-8")
+    start = schema.find("    ### 自动纠错\n")
+    if start < 0:
+        sys.exit("Could not locate the 自动纠错 rules in rime_ice.schema.yaml")
+    end = re.compile(r"^[^\s#]", re.M).search(schema, start)
+    end = end.start() if end else len(schema)
+    rules = re.findall(r"^\s+- (\S+)", schema[start:end], flags=re.M)
+    files["rime_ice.schema.yaml"] = (schema[:start] + schema[end:]).encode("utf-8")
+    files["rime_ice.correction.txt"] = "".join(f"{r}\n" for r in rules).encode("utf-8")
     for s in RIME_ICE_DOUBLE_PINYIN:
         add(f"{s}.schema.yaml", no_lua / f"{s}.schema.yaml")
     for f in ("melt_eng.schema.yaml", "melt_eng.dict.yaml", "radical_pinyin.schema.yaml",

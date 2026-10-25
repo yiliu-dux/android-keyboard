@@ -677,6 +677,10 @@
     <string name="chinese_setting_simplification_force_traditional">Traditional</string>
     <string name="chinese_setting_pinyin_scheme">Pinyin Scheme</string>
     <string name="chinese_setting_fuzzy_pinyin">Fuzzy Pinyin</string>
+    <string name="chinese_setting_typo_correction">Typo correction</string>
+    <string name="chinese_setting_typo_correction_subtitle">Also match syllables one keystroke away from what was typed</string>
+    <string name="chinese_setting_schema_correction">Misspelling rules</string>
+    <string name="chinese_setting_schema_correction_subtitle">Also match common misspellings, such as swapped letters (rime-ice only)</string>
 
     <!-- Specific to Japanese input method -->
     <string name="japanese_settings_title">Japanese Input Settings</string>

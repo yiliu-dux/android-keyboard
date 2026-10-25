@@ -7,6 +7,7 @@
 - fix emoji and emoji search window spacing
 - add chinese input fuzzy pinyin
 - use [rime-ice](https://github.com/iDvel/rime-ice) for Simplified full pinyin when it is present in the imported Chinese dictionary (falls back to `luna_pinyin_simp`)
+- add Chinese "Typo correction" and "Misspelling rules" toggles (both off by default, so input only matches by completing what was typed); the misspelling rules require a dictionary packed with the current `tools/pack_rime_ice.py`
 
 #### Packing the rime-ice dictionary
 
@@ -14,7 +15,7 @@
 
 ```
 git clone https://github.com/iDvel/rime-ice
-python tools/pack_rime_ice.py --rime-ice ../rime-ice --base ../zidian-v26.02.dict --out rime-ice-zh.zip
+python tools/pack_rime_ice.py --include-tencent --rime-ice ../rime-ice --base ../zidian-v26.02.dict --out rime-ice-zh.zip
 ```
 
 - Add `--include-tencent` to also include the large Tencent word list (much slower first-time deployment on the phone).
